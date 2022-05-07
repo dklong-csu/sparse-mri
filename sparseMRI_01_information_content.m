@@ -35,7 +35,7 @@ Fim = fft2(im);
 % colormap gray
 
 % Choose how many spokes we can use
-ratio = .05; % Ratio of known spokes
+ratio = .20; % Ratio of known spokes
 N = round(ratio*row*col);
 
 
