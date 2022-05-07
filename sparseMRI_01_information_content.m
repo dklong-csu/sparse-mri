@@ -175,8 +175,8 @@ title('Approach 4: random lines through origin','fontsize',fsize)
 % Save image to file
 imwrite(uint8(255*plotim4.^gammacorr),'pics/MRI_sparsedemo_4.png','png')
 
-%%
-%%approach 5, concentric circles with a full center
+%% additional methods
+%% Approach #5, concentric circles with a full center
 
 Fim_sparse5 = zeros(size(Fim));
 
