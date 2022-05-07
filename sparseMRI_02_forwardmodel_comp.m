@@ -119,4 +119,4 @@ b_sparse_real = dft2D_mtx_sparse_real*image(:);
 b_sparse_real_Noise = b_sparse_real + randn(size(b_sparse_real))*0.01;
 
 % Save the model to disc
-% save data/forwardmodel_vertical M N b_sparse_real_Noise dft2D_mtx_sparse_real image plotim
+save data/forwardmodel M N b_sparse_real_Noise dft2D_mtx_sparse_real image

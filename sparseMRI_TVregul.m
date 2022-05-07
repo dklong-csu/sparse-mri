@@ -33,8 +33,6 @@ load data/forwardmodel M N b_sparse_real_Noise dft2D_mtx_sparse_real image
 % Graphical parameters
 fsize = 20;
 
-<<<<<<< Updated upstream
-=======
 % Image size will be MxM. M should preferably be a power of 2. 
 % It seems that the algorithm has difficulties for M>32.
 M = 64;
@@ -81,6 +79,7 @@ title('Sanity check (complex): do we get the original back?');
 %% Sparsify the measurement
 
 % Number of known spokes
+spoke_percent = 0.05;
 N = round(spoke_percent*M^2); 
 
 % These construct index1 for each of the three sparsifying methods
@@ -150,13 +149,13 @@ b_sparse_real_Noise = b_sparse_real + randn(size(b_sparse_real))*0.01;
 % axis image
 % colormap(gray)
 % title('Inverse transformed sparse image, real version');
->>>>>>> Stashed changes
+
 
 
 
 %% Reconstruction and denoising using ROF model
 
-addpath(genpath('../../flexBox/'));
+addpath(genpath('../flexBox/'));
 main = flexBox;
 main.params.tryCPP = 0; %change, if C++ module is compiled
 
@@ -167,7 +166,9 @@ numberU = main.addPrimalVar(size(image));
 main.addTerm(L2dataTermOperator(1,dft2D_mtx_sparse_real,b_sparse_real_Noise),numberU);
 
 %add regularizer
-main.addTerm(L1gradientIso(RegParam,size(image)),numberU); %TV-regularization
+% main.addTerm(L1gradientIso(RegParam,size(image)),numberU); %TV-regularization
+main.addTerm(L2identity(RegParam,size(image)),numberU); % Tikhonov L2 regularization
+%main.addTerm(L2laplace(RegParam,size(image)),numberU); % Generalized Tikhonov with Laplace operator
 
 %box constraint ensures the result to stay in [0,1]
 main.addTerm(boxConstraint(0,1,size(image)),numberU);
