@@ -35,9 +35,10 @@ Fim = fft2(im);
 % colormap gray
 
 % Choose how many spokes we can use
-ratio = .20; % Ratio of known spokes
+ratio = .2; % Ratio of known spokes
 N = round(ratio*row*col);
 
+vert_divider = dividercolor*ones(row,round(dividerwidth*col));
 
 %% Approach #1: random spokes
 
@@ -70,7 +71,7 @@ colormap gray
 title('Approach 1: random sampling','fontsize',fsize)
 
 % Save image to file
-imwrite(uint8(255*plotim1.^gammacorr),'pics/MRI_sparsedemo_1.png','png')
+imwrite(uint8(255*plotim1.^gammacorr),'pics/MRI_sparsedemo_1_2.png','png')
 
 
 %% Approach #2: low-pass
@@ -104,7 +105,7 @@ colormap gray
 title('Approach 2: low-pass filter','fontsize',fsize)
 
 % Save image to file
-imwrite(uint8(255*plotim2.^gammacorr),'pics/MRI_sparsedemo_2.png','png')
+imwrite(uint8(255*plotim2.^gammacorr),'pics/MRI_sparsedemo_2_2.png','png')
 
 %% Approach #3: horizontal lines
 
@@ -135,7 +136,7 @@ colormap gray
 title('Approach 3: horizontal lines','fontsize',fsize)
 
 % Save image to file
-imwrite(uint8(255*plotim3.^gammacorr),'pics/MRI_sparsedemo_3.png','png')
+imwrite(uint8(255*plotim3.^gammacorr),'pics/MRI_sparsedemo_3_2.png','png')
 
 
 %% Approach #4: random lines through origin
@@ -173,124 +174,4 @@ colormap gray
 title('Approach 4: random lines through origin','fontsize',fsize)
 
 % Save image to file
-imwrite(uint8(255*plotim4.^gammacorr),'pics/MRI_sparsedemo_4.png','png')
-
-%% additional methods
-%% Approach #5, concentric circles with a full center
-
-Fim_sparse5 = zeros(size(Fim));
-
-% Create index vector indicating the known spokes, and form index image
-
-t = linspace(-1,1,row); % Assuming row=col
-[X5,Y5] = meshgrid(t); % Coordinates for the (fftshift-rearranged) frequency domain
-
-nr = 10; %number of concentric circles
-
-maxr = 0.5; %maximum allowed additional radius away from inner circle
-
-fullr = 0.1; %radius of the cicrle we may choose to always include
-
-indim5 = zeros(size(Fim));
-
-for i = 1:nr
-%select the appropriate radius
-R = i*maxr/nr + fullr;%<<uncomment this to add the circles outside of the inner one 
-
-indim5(abs(abs(X5+1i*Y5)-R*ones(row))<0.01) = 1; % form the circle
-
-end
-
-% option to always include the center circle.
- indim5(abs(X5 + 1i*Y5)<fullr) = 1;
-
-index5 = (fftshift(indim5)>0);
-
-% Apply the index vector to frequency domain information
-Fim_sparse5(index5) = Fim(index5);
-% Apply inverse Fourier transform
-filtered_im5 = real(ifft2(Fim_sparse5));
-% Scale filtered image to interval [0,1]. Note that after this step the
-% pixel values are not anymore directly comparable to the original image
-% pixel values.
-filtered_im5 = max(0,filtered_im5); % Remove possible negative pixels
-filtered_im5 = filtered_im5/max(filtered_im5(:)); % Scale max to 1
-
-ssim_index5 = ssim(filtered_im5,im)
-
-compression5 = size(find(indim5==1),1)/(row*col)
-
-% Take a look
-figure(5)
-clf
-plotim5 = [im,vert_divider,indim5,vert_divider,filtered_im5];
-imagesc(plotim5.^gammacorr)
-axis equal
-axis off
-colormap gray
-title(['Concentric Circles ' , 'ssim: ', num2str(ssim_index5) , ' comp: ' , num2str(compression5)],'fontsize',9)
-
-
-
-%% Approach #6: bike wheel
-
-%We changed code here.
-
-R = 0.7;
-
-% # spokes
-
-n = 30;
-
-% Initialize the sparse frequency domain information
-Fim_sparse6 = zeros(size(Fim));
-% Create index vector indicating the known spokes, and form index image
-t = linspace(-1,1,row); % Assuming row=col
-[X,Y] = meshgrid(t); % Coordinates for the (fftshift-rearranged) frequency domain
-% Choose random lines as long as N spokes get chosen
-indim6 = zeros(size(Fim)); % Initialize index image
-for i = 1:n
-    theta = 2*pi/n*i; % Random direction
-    dirind = abs(X*cos(theta)+Y*sin(theta))<.01 & abs(X.^2 + Y.^2 )<R;
-    indim6(dirind) = 1;
-end
-
-%hub
-
-hubR = 0.15;
-
-indim6(abs(X+1i*Y)<hubR) = 1;
-
-%tire
-tireR = 0.8;
-indim6(abs(abs(X+1i*Y)-tireR*ones(row))<0.03) = 1;
-
-index6 = (fftshift(indim6)>0);
-% Apply the index vector to frequency domain information
-Fim_sparse6(index6) = Fim(index6);
-% Apply inverse Fourier transform
-filtered_im6 = real(ifft2(Fim_sparse6));
-% Scale filtered image to interval [0,1]. Note that after this step the
-% pixel values are not anymore directly comparable to the original image
-% pixel values.
-filtered_im6 = max(0,filtered_im6); % Remove possible negative pixels
-filtered_im6 = filtered_im6/max(filtered_im6(:)); % Scale max to 1
-% Take a look
-figure(6)
-clf
-plotim6 = [im,vert_divider,indim6,vert_divider,filtered_im6];
-imagesc(plotim6.^gammacorr)
-axis equal
-axis off
-colormap gray
-title('Approach 6: Bike Wheel','fontsize',fsize)
-
-compression6 = size(find(indim6 ==1),1 )/(row*col);
-
-similarity6 = ssim(filtered_im6,im);
-
-fprintf("Bike Wheel ssim: %f compression ratio: %f \n", similarity6, compression6);
-
-% Save image to file
-imwrite(uint8(255*plotim6.^gammacorr),'pics/MRI_sparsedemo_6.png','png')
-
+imwrite(uint8(255*plotim4.^gammacorr),'pics/MRI_sparsedemo_4_2.png','png')
