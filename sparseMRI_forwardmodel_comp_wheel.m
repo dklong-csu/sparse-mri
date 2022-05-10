@@ -25,7 +25,7 @@ fsize = 20;
 
 % Image size will be MxM. M should preferably be a power of 2. 
 % It seems that the algorithm has difficulties for M>32.
-M = 32;
+M = 64;
 
 %read MRI example and downsample
 image = im2double(imread('pics/SamuBrain_1024.png'));
@@ -85,9 +85,9 @@ indim6(abs(X+1i*Y)<hubR) = 1;
 tireR = 0.8;
 indim6(abs(abs(X+1i*Y)-tireR*ones(M))<0.03) = 1;
 
-index6 = (fftshift(indim6)>0);
+% index6 = (fftshift(indim6)>0);
 
-index1 = find(index6>0);
+index1 = find(indim6>0);
 
 N = length(index1);%this changes based on the method used
 

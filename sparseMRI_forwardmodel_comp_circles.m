@@ -25,7 +25,7 @@ fsize = 20;
 
 % Image size will be MxM. M should preferably be a power of 2. 
 % It seems that the algorithm has difficulties for M>32.
-M = 32;
+M = 64;
 
 %read MRI example and downsample
 image = im2double(imread('pics/SamuBrain_1024.png'));
