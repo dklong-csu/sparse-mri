@@ -16,7 +16,7 @@ rng(0,'twister')
 RegParam = .1;
 
 % Degree of sparsity in the measurement
-spoke_percent  = .2; % eg, 0.2 means 20 percent
+spoke_percent  = .05; % eg, 0.2 means 20 percent
 
 % Graphical parameters
 fsize = 20;
@@ -85,29 +85,29 @@ N = round(spoke_percent*M^2);
 % index1 = tmp(1:N);
 
 % Sparsifying method 3: low-pass filter
-% t = linspace(-1,1,M); 
-% [X,Y] = meshgrid(t); % Coordinates for the (fftshift-rearranged into intuitive form) frequency domain
-% R = sqrt(N/M^2); % Initial candidate for radius
-% index1 = find(abs(X+1i*Y)<R); % This will result in only *approximately* the correct number N of known spokes
-% while length(index1)<N
-%     R = 1.01*R;
-%     index1 = find(abs(X+1i*Y)<R);
-% end
-% index1 = index1(1:N); % Crop to have the correct amount of spokes in the index1 vector
-
-% Sparsifying method 3: random lines through origin
-% Create index vector indicating the known spokes, and form index image
-t = linspace(-1,1,M); % Assuming row=col
-[X,Y] = meshgrid(t); % Coordinates for the (fftshift-rearranged) frequency domain
-% Choose random lines as long as N spokes get chosen
-indim4 = zeros(M,M); % Initialize index image
-while length(find(indim4(:)>0))<N
-    theta = rand*2*pi; % Random direction
-    dirind = abs(X*cos(theta)+Y*sin(theta))<.01;
-    indim4(dirind) = 1;
+t = linspace(-1,1,M); 
+[X,Y] = meshgrid(t); % Coordinates for the (fftshift-rearranged into intuitive form) frequency domain
+R = sqrt(N/M^2); % Initial candidate for radius
+index1 = find(abs(X+1i*Y)<R); % This will result in only *approximately* the correct number N of known spokes
+while length(index1)<N
+    R = 1.01*R;
+    index1 = find(abs(X+1i*Y)<R);
 end
-index1 = indim4;
-index1 = find(index1==1);
+index1 = index1(1:N); % Crop to have the correct amount of spokes in the index1 vector
+
+% Sparsifying method 4: random lines through origin
+% Create index vector indicating the known spokes, and form index image
+% t = linspace(-1,1,M); % Assuming row=col
+% [X,Y] = meshgrid(t); % Coordinates for the (fftshift-rearranged) frequency domain
+% % Choose random lines as long as N spokes get chosen
+% indim4 = zeros(M,M); % Initialize index image
+% while length(find(indim4(:)>0))<N
+%     theta = rand*2*pi; % Random direction
+%     dirind = abs(X*cos(theta)+Y*sin(theta))<.01;
+%     indim4(dirind) = 1;
+% end
+% index1 = indim4;
+% index1 = find(index1==1);
 
 
 %% Sanity check that sparsity was created correctly
@@ -150,4 +150,4 @@ b_sparse_real = dft2D_mtx_sparse_real*image(:);
 b_sparse_real_Noise = b_sparse_real + randn(size(b_sparse_real))*0.01;
 
 % Save the model to disc
-save matrix-data/forwardmodel_randomline20 M N b_sparse_real_Noise dft2D_mtx_sparse_real image
+save matrix-data/forwardmodel_lowpass5 M N b_sparse_real_Noise dft2D_mtx_sparse_real image plotim
