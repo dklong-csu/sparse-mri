@@ -16,7 +16,7 @@ rng(0,'twister')
 RegParam = .1;
 
 % Degree of sparsity in the measurement
-spoke_percent  = .05; % eg, 0.2 means 20 percent
+spoke_percent  = .2; % eg, 0.2 means 20 percent
 
 % Graphical parameters
 fsize = 20;
@@ -125,4 +125,4 @@ b_sparse_real = dft2D_mtx_sparse_real*image(:);
 b_sparse_real_Noise = b_sparse_real + randn(size(b_sparse_real))*0.01;
 
 % Save the model to disc
-%save matrix-data/forwardmodel_circles M N b_sparse_real_Noise dft2D_mtx_sparse_real image
+save matrix-data/forwardmodel_circles M N b_sparse_real_Noise dft2D_mtx_sparse_real image
